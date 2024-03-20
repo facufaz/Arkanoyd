@@ -33,8 +33,11 @@
   let dy = -2;
 
   // variables de la paleta
-  let paddleHeight = 10;
-  let paddleWidth = 70;
+  let paddleHeight = 13;
+  let paddleWidth = 80;
+
+  let rightPressed = false;
+  let leftPressed = false;
 
   let paddleX = (canvas.width - paddleWidth) / 2;
   let paddleY = canvas.height - paddleHeight - 10;
@@ -47,13 +50,8 @@
     ctx.closePath();
   }
   function drawPaddle() {
-    ctx.fillStyle = 'green';
-    ctx.fillRect(
-      paddleX, 
-      paddleY,
-      paddleWidth,
-      paddleHeight,
-      );
+    ctx.fillStyle = "green";
+    ctx.fillRect(paddleX, paddleY, paddleWidth, paddleHeight);
   }
   function drawBricks() {}
 
@@ -76,13 +74,45 @@
     }
   }
 
-  function paddleMovement() {}
+  function initEvent() {
+    document.addEventListener("keydown", keyDownHandler);
+    document.addEventListener("keyup", keyUpHandler);
+
+    function keyDownHandler(event) {
+      const { key } = event;
+
+      if (key === "Right" || key === "ArrowRight") {
+        rightPressed = true;
+      } else if (key === "Left" || key === "ArrowLeft") {
+        leftPressed = true;
+      }
+    }
+    function keyUpHandler(event) {
+      const { key } = event;
+
+      if (key === "Right" || key === "ArrowRight") {
+        rightPressed = false;
+      } else if (key === "Left" || key === "ArrowLeft") {
+        leftPressed = false;
+      }
+    }
+  }
+
+  function paddleMovement() {
+    if (rightPressed && paddleX < canvas.width - paddleWidth) {
+      paddleX += 7;
+    }
+    if (leftPressed && paddleX > 0) {
+      paddleX -= 7;
+    }
+  }
 
   function clearCanvas() {
     ctx.clearRect(0, 0, canvas.height, canvas.width);
   }
 
   function draw() {
+    console.log({ rightPressed, leftPressed });
     clearCanvas();
     drawBall();
     drawPaddle();
@@ -98,4 +128,5 @@
   }
 
   draw();
+  initEvent();
 </script>
