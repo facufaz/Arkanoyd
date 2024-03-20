@@ -17,8 +17,8 @@
   const canvas = document.querySelector("canvas");
   const ctx = canvas.getContext("2d");
 
-  canvas.width = 400;
-  canvas.height = 400;
+  canvas.width = 500;
+  canvas.height = 500;
 
   // Variables del juego
   let counter = 0;
@@ -33,6 +33,9 @@
   let dy = -2;
 
   // variables de la paleta
+  let paddleHeight = 10;
+  let paddleWidth = 70;
+
   let paddleX = (canvas.width - paddleWidth) / 2;
   let paddleY = canvas.height - paddleHeight - 10;
 
@@ -43,7 +46,15 @@
     ctx.fill();
     ctx.closePath();
   }
-  function drawPaddle() {}
+  function drawPaddle() {
+    ctx.fillStyle = 'green';
+    ctx.fillRect(
+      paddleX, 
+      paddleY,
+      paddleWidth,
+      paddleHeight,
+      );
+  }
   function drawBricks() {}
 
   function colissionDetection() {}
