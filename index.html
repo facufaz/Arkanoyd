@@ -1,28 +1,33 @@
 <title>Arkanoid</title>
 <style>
   body {
-    background-color: black;
+    background-color: #f0f0f0;
+    display: grid;
+    place-content: center;
   }
   canvas {
-    border: 4px solid #fff;
+    border: 4px solid #000;
     border-bottom: transparent;
-    background: #000;
+    background: url("./bkg.png") repeat;
     margin: 0 auto;
     display: block;
-    background-image: url(./bkg.png);
+    box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.4);
   }
 </style>
 <canvas></canvas>
 
-<img hidden id="sprite" src="./sprite.png" alt="sprite arkanoyd" />
-<img hidden id="bricks" src="./bricks.png" alt="bricks" />
+<img hidden id="sprite" src="./sprite.png" alt="Sprite Arkanoid" />
+<img hidden id="bricks" src="./bricks.png" alt="Sprite Bricks Arkanoid" />
 
 <script>
   const canvas = document.querySelector("canvas");
   const ctx = canvas.getContext("2d");
 
-  canvas.width = 400;
-  canvas.height = 400;
+  const $sprite = document.querySelector("#sprite");
+  const $bricks = document.querySelector("#bricks");
+
+  canvas.width = 448;
+  canvas.height = 448;
 
   // Variables del juego
   let counter = 0;
@@ -33,8 +38,8 @@
   let y = canvas.height - 30;
 
   //   velocidad de la pelota
-  let dx = 4;
-  let dy = 5;
+  let dx = 3;
+  let dy = 3;
 
   // variables de la paleta
   let paddleHeight = 13;
@@ -57,11 +62,11 @@
 
   const brickRowCount = 8;
   const brickColumnCount = 13;
-  const brickWidth = 25;
-  const brickHeight = 12;
-  const brickPadding = 3;
-  const brickOffSetTop = 50;
-  const brickOffSetLeft = 20;
+  const brickWidth = 32;
+  const brickHeight = 16;
+  const brickPadding = 0;
+  const brickOffSetTop = 80;
+  const brickOffSetLeft = 16;
   const bricks = [];
 
   for (let c = 0; c < brickColumnCount; c++) {
@@ -90,7 +95,7 @@
   }
   function drawPaddle() {
     ctx.drawImage(
-      sprite,
+      $sprite,
       29,
       174,
       paddleWidth,
@@ -111,11 +116,11 @@
         const clipX = currentBrick.color * 32;
 
         ctx.drawImage(
-          bricks,
+          $bricks,
           clipX,
           0,
-          26,
-          10,
+          brickWidth,
+          brickHeight,
           currentBrick.x,
           currentBrick.y,
           brickWidth,
@@ -125,7 +130,24 @@
     }
   }
 
-  function colissionDetection() {}
+  function colissionDetection() {
+    for (let c = 0; c < brickColumnCount; c++) {
+      for (let r = 0; r < brickRowCount; r++) {
+        const currentBrick = bricks[c][r];
+        if (currentBrick.status === BRICK_STATUS.DESTROYED) continue;
+        const isBallSameXAsBrick =
+          x > currentBrick.x && x < currentBrick.x + brickWidth;
+
+        const isBallSameYAsBrick =
+          y > currentBrick.y && y < currentBrick.y + brickHeight;
+
+        if (isBallSameXAsBrick && isBallSameYAsBrick) {
+          dy = -dy;
+          currentBrick.status = BRICK_STATUS.DESTROYED;
+        }
+      }
+    }
+  }
   function ballMovement() {
     const isBallSameXAsPaddle = x > paddleX && x < paddleX + paddleWidth;
 
@@ -207,5 +229,4 @@
 
   draw();
   initEvent();
-  drawPaddle();
 </script>
