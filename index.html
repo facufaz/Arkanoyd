@@ -9,16 +9,20 @@
     background: #000;
     margin: 0 auto;
     display: block;
+    background-image: url(./bkg.png);
   }
 </style>
 <canvas></canvas>
+
+<img hidden id="sprite" src="./sprite.png" alt="sprite arkanoyd" />
+<img hidden id="bricks" src="./bricks.png" alt="bricks" />
 
 <script>
   const canvas = document.querySelector("canvas");
   const ctx = canvas.getContext("2d");
 
-  canvas.width = 500;
-  canvas.height = 500;
+  canvas.width = 400;
+  canvas.height = 400;
 
   // Variables del juego
   let counter = 0;
@@ -29,18 +33,53 @@
   let y = canvas.height - 30;
 
   //   velocidad de la pelota
-  let dx = 2;
-  let dy = -2;
+  let dx = 4;
+  let dy = 5;
 
   // variables de la paleta
   let paddleHeight = 13;
-  let paddleWidth = 80;
+  let paddleWidth = 50;
 
   let rightPressed = false;
   let leftPressed = false;
 
   let paddleX = (canvas.width - paddleWidth) / 2;
   let paddleY = canvas.height - paddleHeight - 10;
+
+  let PADDLE_SENSIBILITY = 8;
+
+  // variables de los ladrillos
+
+  const BRICK_STATUS = {
+    ACTIVE: 1,
+    DESTROYED: 0,
+  };
+
+  const brickRowCount = 8;
+  const brickColumnCount = 13;
+  const brickWidth = 25;
+  const brickHeight = 12;
+  const brickPadding = 3;
+  const brickOffSetTop = 50;
+  const brickOffSetLeft = 20;
+  const bricks = [];
+
+  for (let c = 0; c < brickColumnCount; c++) {
+    bricks[c] = [];
+    for (let r = 0; r < brickRowCount; r++) {
+      const brickX = c * (brickWidth + brickPadding) + brickOffSetLeft;
+      const brickY = r * (brickHeight + brickPadding) + brickOffSetTop;
+
+      const random = Math.floor(Math.random() * 8);
+
+      bricks[c][r] = {
+        x: brickX,
+        y: brickY,
+        status: BRICK_STATUS.ACTIVE,
+        color: random,
+      };
+    }
+  }
 
   function drawBall() {
     ctx.beginPath();
@@ -50,13 +89,52 @@
     ctx.closePath();
   }
   function drawPaddle() {
-    ctx.fillStyle = "green";
-    ctx.fillRect(paddleX, paddleY, paddleWidth, paddleHeight);
+    ctx.drawImage(
+      sprite,
+      29,
+      174,
+      paddleWidth,
+      paddleHeight,
+      paddleX,
+      paddleY,
+      paddleWidth,
+      paddleHeight
+    );
   }
-  function drawBricks() {}
+
+  function drawBricks() {
+    for (let c = 0; c < brickColumnCount; c++) {
+      for (let r = 0; r < brickRowCount; r++) {
+        const currentBrick = bricks[c][r];
+        if (currentBrick.status === BRICK_STATUS.DESTROYED) continue;
+
+        const clipX = currentBrick.color * 32;
+
+        ctx.drawImage(
+          bricks,
+          clipX,
+          0,
+          26,
+          10,
+          currentBrick.x,
+          currentBrick.y,
+          brickWidth,
+          brickHeight
+        );
+      }
+    }
+  }
 
   function colissionDetection() {}
   function ballMovement() {
+    const isBallSameXAsPaddle = x > paddleX && x < paddleX + paddleWidth;
+
+    const isBallTouchingPaddle = y + dy > paddleY;
+
+    if (isBallTouchingPaddle && isBallSameXAsPaddle) {
+      dy = -dy;
+    }
+
     // rebote lateral
     if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
       dx = -dx;
@@ -100,10 +178,10 @@
 
   function paddleMovement() {
     if (rightPressed && paddleX < canvas.width - paddleWidth) {
-      paddleX += 7;
+      paddleX += PADDLE_SENSIBILITY;
     }
     if (leftPressed && paddleX > 0) {
-      paddleX -= 7;
+      paddleX -= PADDLE_SENSIBILITY;
     }
   }
 
@@ -129,4 +207,5 @@
 
   draw();
   initEvent();
+  drawPaddle();
 </script>
